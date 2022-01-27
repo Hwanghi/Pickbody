@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.secondhand.mapper.SecondhandSQLMapper">
+
+	<select id="createSecondhandPK" resultType="int">
+		SELECT PB_Secondhand_seq.nextval FROM Dual
+	</select>
+
+	<insert id="SecondhandWriteContent">
+		INSERT INTO PB_Secondhand VALUES(
+			#{item_no},
+			#{member_no},
+			1,
+			#{item_title},
+			#{item_content},
+			#{item_price},
+			#{item_negotiate},
+			'판매중',
+			#{item_condition},
+			#{item_keyword},
+			#{item_refund},
+		    SYSDATE,
+		    0,
+		    #{item_location}
+		)		
+	</insert>
+	
+	<select id="categorybigList" resultType="com.ja.pickbody.vo.SecondhandCategoryBigVo">
+		SELECT*FROM pb_secondhandcategorybig ORDER BY big_no
+	</select>
+	
+	<select id="categoryList" resultType="com.ja.pickbody.vo.SecondhandCategoryVo">
+		SELECT*FROM pb_secondhandcategory WHERE big_no = #{big_no}
+	</select>
+	
+	<select id="insertImage">
+			INSERT INTO PB_Secondhand_Image VALUES(
+		    PB_Secondhand_Image_seq.nextval,
+		    #{item_no},
+		    #{image_link},
+		    #{image_original_filename}
+		)
+	</select>
+	
+		<select id="itemthumbnail" resultType="com.ja.pickbody.vo.SecondhandImageVo">
+		SELECT * FROM PB_Secondhand_Image WHERE item_no = #{item_no} AND ROWNUM=1
+	</select>
+	
+	<select id="getitemlist" resultType="com.ja.pickbody.vo.SecondhandVo">
+		SELECT*FROM PB_Secondhand ORDER BY item_no DESC
+	</select>
+	
+	<select id="getitemtwolist" resultType="com.ja.pickbody.vo.SecondhandVo">
+	 
+	<![CDATA[SELECT*FROM PB_Secondhand where member_no= #{no} AND ROWNUM <3 ORDER BY item_no DESC]]>
+	 
+	</select>
+	
+	
+	<select id="getitemByNo" resultType="com.ja.pickbody.vo.SecondhandVo">
+		SELECT*FROM PB_Secondhand WHERE item_no = #{no}
+	</select>
+	
+	
+	<select id="getimage" resultType="com.ja.pickbody.vo.SecondhandImageVo">
+		SELECT * FROM PB_Secondhand_Image WHERE item_no = #{item_no}
+	</select>
+	
+	<insert id="SecondhandWriteComment">
+		INSERT INTO PB_SecondhandComment VALUES(
+		    PB_SecondhandComment_seq.nextval,
+		    #{item_no},
+  		    #{comment_writerno},
+		    #{comment_content},
+		    SYSDATE
+		)
+	</insert>
+	
+	<select id="getSecondhandcommentlist" resultType="com.ja.pickbody.vo.SecondhandCommentVo">
+		SELECT * FROM PB_SecondhandComment
+		WHERE item_no = #{item_no}
+	</select>
+	
+	
+	<insert id="Like">
+			INSERT INTO PB_SecondhandLike VALUES(
+		    PB_SecondhandLike_seq.nextval,
+		    #{member_no},
+		    #{item_no}
+		 )
+	</insert>
+	
+	
+	
+		<delete id="unLike">
+		DELETE FROM PB_SecondhandLike 
+		WHERE member_no = #{member_no} AND item_no = #{item_no}
+	</delete>
+
+	<select id="myLikeCount" resultType="int">
+		SELECT COUNT(*) FROM PB_SecondhandLike 
+		WHERE member_no = #{member_no} AND item_no = #{item_no}
+	</select>
+
+	<select id="totalLikeCount" resultType="int">
+		SELECT COUNT(*) FROM PB_SecondhandLike WHERE item_no = #{item_no}
+	</select>
+	
+	
+	<insert id="buyprocess">
+	INSERT INTO PB_SecondhandTrade VALUES(
+    PB_SecondhandTrade_seq.nextval,
+    #{item_no},
+    #{buyer_no},
+   	 SYSDATE,
+    '거래신청중'
+    )
+	</insert>
+	
+	<select id="getwishlist" resultType="com.ja.pickbody.vo.SecondhandLikeVo">
+		SELECT * FROM PB_SecondhandLike
+		WHERE member_no = #{member_no}
+	</select>
+	
+	
+	<select id="getsalelist" resultType="com.ja.pickbody.vo.SecondhandVo">
+		SELECT*FROM PB_Secondhand
+		Where member_no = #{member_no}
+	
+	
+	</select>
+	
+	<select id="getbuyerlistByNo" resultType="com.ja.pickbody.vo.SecondhandTradeVo">
+		SELECT*FROM PB_SecondhandTrade
+		Where item_no = #{item_no}
+	</select>
+	
+	<select id="getbuylistByNo" resultType="com.ja.pickbody.vo.SecondhandTradeVo">
+	SELECT*FROM PB_SecondhandTrade
+	Where buyer_no = #{buyer_no}
+	</select>
+	
+	<select id="prohibittrade" resultType="com.ja.pickbody.vo.SecondhandTradeVo">
+	SELECT*FROM PB_SecondhandTrade
+	Where item_no = #{item_no} 	
+	AND buyer_no = #{buyer_no}
+	 
+	</select>
+	
+	
+	
+	
+	<update id="updatefirstitem">
+	UPDATE PB_Secondhand
+	SET item_status = '거래중'
+	WHERE item_no = #{item_no}
+	</update>
+	
+	<update id="updatefirstbuyer">
+	UPDATE PB_SecondhandTrade
+	SET buy_status = '거래중'
+	WHERE buy_no = #{buy_no}
+	</update>
+	
+	<update id="updateseconditem">
+	UPDATE PB_Secondhand
+	SET item_status = '거래완료'
+	WHERE item_no = #{item_no}
+	</update>
+	
+	<update id="updatesecondbuyer">
+	UPDATE PB_SecondhandTrade
+	SET buy_status = '거래종료'
+	WHERE item_no = #{item_no}
+	</update>
+	
+	<update id="updatesecondrealbuyer">
+	UPDATE PB_SecondhandTrade
+	SET buy_status = '거래성공'
+	where buy_no = #{buy_no}
+	
+	</update>
+	
+	<update id="updateevaluatesales">
+	UPDATE PB_Secondhand
+	SET item_status = '평가완료'
+	where item_no = #{item_no}
+	</update>
+	
+	<update id="updateevaluatebuyer">
+	UPDATE PB_SecondhandTrade
+	SET buy_status = '평가완료'
+	where buy_no = #{buy_no}
+	</update>
+	
+	<insert id="writeevaluate">
+	
+	INSERT INTO PB_SecondhandEvaluate VALUES(
+		PB_Secondhandevaluate_seq.nextval,
+	    #{item_no},
+	    #{buyer_no},
+	    #{sales_no},
+	    #{evaluate_score},
+	    #{evaluate_comment},
+	     SYSDATE,
+	    #{sender_no},
+	    #{setter_no}
+	
+	)
+	</insert>
+	
+	<select id="averageevaluateslaes" resultType="int">
+	SELECT NVL(AVG(EVALUATE_SCORE),0) FROM PB_Secondhandevaluate WHERE setter_no = #{no} AND sales_no = #{no}
+	</select>
+	
+	<select id="averageevaluatebuy" resultType="int">
+	SELECT NVL(SUM(EVALUATE_SCORE),0) FROM PB_Secondhandevaluate WHERE setter_no = #{no} AND buyer_no = #{no}
+	</select>
+	
+	<select id="countbuyer" resultType="int">
+	
+	SELECT COUNT(buyer_no)  FROM PB_SECONDHANDtrade where item_no = #{no}
+	</select>
+	
+	<select id="countevaluate" resultType="int">
+	SELECT COUNT(evaluate_no)  FROM PB_SECONDHANDevaluate where sales_no = #{no}
+	</select>
+	
+	<select id="countsellitem" resultType="int">
+	SELECT COUNT(item_no)  FROM PB_SECONDHAND where member_no = #{no}
+	</select>
+	
+	
+	<select id="getevaluateone" resultType="com.ja.pickbody.vo.SecondhandEvaluateVo">	
+		
+	<![CDATA[SELECT * FROM PB_SecondhandEvaluate WHERE setter_no = #{member_no} AND sales_no = #{member_no} AND ROWNUM<2 ORDER BY evaluate_no DESC]]>
+	</select>
+	
+	<select id="getboardbymemberno" resultType="com.ja.pickbody.vo.SecondhandVo">	
+		
+	SELECT * FROM PB_Secondhand WHERE member_no = #{member_no}		
+	</select>
+	
+	<select id="getevaluatesalesbymemberno" resultType="com.ja.pickbody.vo.SecondhandEvaluateVo">	
+		
+	SELECT * FROM PB_SecondhandEvaluate	WHERE setter_no= #{member_no} AND sales_no = #{member_no}
+	</select>
+	<select id="getevaluatebuyerbymemberno" resultType="com.ja.pickbody.vo.SecondhandEvaluateVo">	
+	SELECT * FROM PB_SecondhandEvaluate	WHERE setter_no= #{member_no} AND buyer_no = #{member_no}		
+			
+	</select>
+	
+	
+	
+	
+	
+
+
+</mapper>

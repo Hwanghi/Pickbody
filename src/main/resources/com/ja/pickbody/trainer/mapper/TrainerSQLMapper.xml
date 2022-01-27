@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 대분류/////: 회원가입 로그인, 전문분야,  PT 프로그램, 스케줄(식단), 운동 -->
+<!-- 소분류***: 데이터 생성, 조회 -->
+<mapper namespace="com.ja.pickbody.trainer.mapper.TrainerSQLMapper">
+	
+	<!-- ///// Trainer가입 로그인 ///// -->
+	<select id="createTrainerPK" resultType="int">
+		SELECT PB_Trainer_seq.nextval FROM Dual
+	</select>
+	<insert id="registerTrainer">
+		INSERT INTO PB_Trainer VALUES(
+		    #{trainer_no},
+		    #{trainer_id},
+		    #{trainer_name},
+		    #{trainer_pw},
+		    #{trainer_phone},
+		    #{trainer_birth},
+		    #{trainer_address},
+		    #{trainer_auth},
+		    #{trainer_email},
+		    #{trainer_gender},
+		    #{trainer_point},
+		    #{trainer_price}
+		)
+	</insert>
+	<select id="getTrainerByNo" resultType="com.ja.pickbody.vo.TrainerVo">
+		SELECT * 
+		FROM PB_Trainer
+		WHERE trainer_no = #{no}
+	</select>
+	<select id="getTrainerByIdAndPw" resultType="com.ja.pickbody.vo.TrainerVo">
+		SELECT * 
+		FROM PB_Trainer
+		WHERE trainer_id = #{trainer_id}
+		AND trainer_pw = #{trainer_pw}
+	</select>
+	
+	<!-- 강사 정보 수정 -->
+	<update id="updateTrainerInfo">
+		UPDATE PB_Trainer
+		SET trainer_address = #{trainer_address},
+			trainer_phone = #{trainer_phone},
+			trainer_email = #{trainer_email}
+		WHERE trainer_no= #{trainer_no}
+	</update>
+	
+	<!-- 강사 프로필사진 -->
+	<!-- 강사 프로필 사진 등록 -->
+	<insert id="registerTrainerProfileImage">
+		INSERT INTO PB_Trainer_Profile_Image VALUES(
+		    PB_Trainer_Profile_Image_seq.nextval,
+		    #{trainer_no},
+		    #{image_link},
+		    #{image_original_filename}
+		)
+	</insert>
+	<!-- 강사 프로필 사진 출력 -->
+	<select id="getTrainerProfileImageByNo" resultType="com.ja.pickbody.vo.TrainerProfileImageVo">
+		SELECT * FROM PB_Trainer_Profile_Image WHERE trainer_no = #{trainer_no}
+	</select>
+	
+	<!-- 강사 프로필 사진 삭제 -->
+	<delete id="deleteTrainerProfileImageByNo">
+		DELETE FROM PB_Trainer_Profile_Image WHERE trainer_no = #{trainer_no}
+	</delete>
+		
+	<!-- 강사 프로필 사진 수정 -->
+	<update id="updateTrainerProfileImage">
+		UPDATE PB_Trainer_Profile_Image
+		SET image_link = #{image_link}, image_original_filename = #{image_original_filename}
+		WHERE trainer_no = #{trainer_no}
+	</update>
+
+	<!-- 강사 프로필 사진 있나 없나 -->
+	<select id="countTrainerProfileImage" resultType="int">
+		SELECT COUNT(*) FROM PB_Trainer_Profile_Image WHERE trainer_no = #{trainer_no}
+	</select>
+	
+	<!-- ///// 전문분야 ///// -->
+	<select id="getGoalCategoryList" resultType="com.ja.pickbody.vo.GoalCategoryVo">
+		SELECT * FROM PB_Goal_Category
+	</select>
+	<select id="getGoalCategoryVo" resultType="com.ja.pickbody.vo.GoalCategoryVo">
+		SELECT * FROM PB_Goal_Category WHERE goal_category_no = #{no}
+	</select>
+	<select id="getTrainerGoalList" resultType="com.ja.pickbody.vo.TrainerGoalVo">
+		SELECT * FROM PB_Trainer_Goal WHERE trainer_no=#{trainer_no}
+	</select>
+	<insert id="addGoalCategory">
+		INSERT INTO PB_Trainer_Goal VALUES (
+			PB_Trainer_Goal_seq.nextval,
+			#{trainer_no},
+			#{goal_category_no}
+		)
+	</insert>
+	
+	<!-- ///// PT 프로그램 ///// -->
+	<select id="getPTProgramVo"  resultType="com.ja.pickbody.vo.PTProgramVo">
+		SELECT * 
+		FROM PB_PT_Program
+		WHERE program_no=#{no}
+	</select>
+	
+	<select id="getPTMemberList" resultType="com.ja.pickbody.vo.PTProgramVo">
+		SELECT * 
+		FROM PB_PT_Program
+		WHERE trainer_no=#{trainerNo}
+	</select>
+	
+	<!-- ///// 강사 스케줄  ///// -->
+	
+	<!-- *** 스케줄 데이터 생성 *** -->
+	<!-- 주간 스케줄 PK -->
+	<select id="createSchedulePK" resultType="int">
+		SELECT PB_Schedule_Week_seq.nextval FROM dual
+	</select>
+	<!-- 주간 스케줄 등록 -->
+	<insert id="registerScheduleWeek">
+		INSERT INTO PB_Schedule_Week VALUES(
+			#{schedule_week_no},
+			#{program_no},
+			#{schedule_startdate},
+			#{schedule_advice},
+			#{week}	
+		)
+	</insert>
+	<!-- 일간 스케줄 생성  -->
+	<insert id="registerScheduleDaily" >
+		INSERT INTO PB_Schedule_Daily VALUES(
+			PB_Schedule_Daily_seq.nextval,
+			#{schedule_week_no},
+			#{schedule_date} 
+		)
+	</insert>
+	<!-- 일간 식단 PK -->
+	<select id="createDietDailyPK" resultType="int">
+		SELECT PB_Diet_Daily_seq.nextval FROM dual
+	</select>
+	<!-- 시간대 추가 -->
+	<insert id="addDietDaily">
+	INSERT INTO PB_Diet_Daily VALUES(
+	    #{diet_no},
+	    #{schedule_no},
+	    #{diet_time} 
+	)
+	</insert>
+	<!-- 식단에 포함될 음식 추가 -->
+	<insert id="addDietFood">
+	INSERT INTO PB_Diet_Food VALUES(
+	    PB_Diet_Food_seq.nextval,
+	    #{diet_no},
+	    #{food_category_no},
+	    #{diet_food_number} 
+	)
+	</insert>
+	
+	<!-- *** 스케줄 데이터 조회 *** -->
+	<!-- 프로그램 번호와 주차로 주간 스케줄 가져오기 -->
+	<select id="getScheduleWeekByProgramNoAndWeek" resultType="com.ja.pickbody.vo.ScheduleWeekVo">
+		SELECT * FROM PB_Schedule_Week 
+		WHERE program_no=#{programNo}
+		AND week=#{week}
+	</select>
+	
+	<!-- 일주일 단위 일간 스케줄 조회 -->
+	<select id="getScheduleDailyList" resultType="com.ja.pickbody.vo.ScheduleDailyVo">
+		SELECT * FROM PB_Schedule_Daily 
+		WHERE schedule_week_no=#{scheduleWeekNo}
+	</select>
+	
+	<!-- 일간 스케줄 상세 정보 가져오기 -->
+	<select id="getScheduleDailyVo" resultType="com.ja.pickbody.vo.ScheduleDailyVo">
+		SELECT * FROM PB_Schedule_Daily
+		WHERE schedule_no=#{no}
+	</select>
+	
+	<!-- 시간대랑 스케줄 번호로 일간 식단 중복 확인 -->
+	<select id="checkDietDaily" resultType="com.ja.pickbody.vo.DietDailyVo">
+		SELECT * FROM PB_Diet_Daily 
+		WHERE schedule_no=#{schedule_no} 
+		AND diet_time=#{diet_time}
+	</select>
+	
+	<!-- 일간 스케줄로 식단 목록 조회 -->
+	<select id="getDietDailyList" resultType="com.ja.pickbody.vo.DietDailyVo">
+		SELECT * FROM PB_Diet_Daily 
+		WHERE schedule_no=#{schedule_no}
+		ORDER BY diet_time
+	</select>
+	
+	<!-- 식단에 포함된 음식 목록 조회-->
+	<select id="getDietFoodList" resultType="com.ja.pickbody.vo.DietFoodVo">
+		SELECT * FROM PB_Diet_Food
+		WHERE diet_no=#{diet_no}
+		ORDER BY food_category_no
+	</select>
+	
+	<!-- 음식 카테고리 가져오기 -->
+	<select id="getFoodCategoryList" resultType="com.ja.pickbody.vo.FoodCategoryVo">
+		SELECT * FROM PB_Food_Category
+	</select>
+	
+	<!-- 개별 음식 정보 가져오기 -->
+	<select id="getFoodCategoryVo" resultType="com.ja.pickbody.vo.FoodCategoryVo">
+		SELECT * FROM PB_Food_Category WHERE food_category_no=#{no}
+	</select>
+	
+	
+	<!-- ///// 운동 루틴 ///// -->
+	
+	<!-- *** 운동 루틴 데이터 생성 *** -->
+	<!-- 일간 운동 루틴 추가 -->
+	<insert id="addRutineDaily">
+	INSERT INTO PB_Rutine_Daily VALUES(
+	    PB_Rutine_Daily_seq.nextval,
+	    #{exercise_category_no},
+	    #{schedule_no},
+	    #{rutine_set},
+	    #{rutine_number},
+	    #{rutine_weight},
+	    #{rutine_resttime} 
+	)
+	</insert>
+	
+	<!-- *** 운동 데이터 조회 *** -->
+	<!-- 운동 카테고리 가져오기 -->
+	<select id="getExerciseCategoryList" resultType="com.ja.pickbody.vo.ExerciseCategoryVo">
+		SELECT * FROM PB_Exercise_Category
+	</select>
+	
+	<!-- 운동 목록 번호로 운동 카테고리 정보 가져오기-->
+	<select id="getExerciseCategoryVo" resultType="com.ja.pickbody.vo.ExerciseCategoryVo">
+		SELECT * FROM PB_Exercise_Category
+		WHERE exercise_category_no=#{no}
+	</select>
+	
+	<!-- 일간 스케줄 번호로 운동 루틴 목록 조회 -->
+	<select id="getRutineDailyList" resultType="com.ja.pickbody.vo.RutineDailyVo">
+		SELECT * FROM PB_Rutine_Daily 
+		WHERE schedule_no=#{schedule_no}
+	</select>
+	
+	
+	
+	
+	
+
+	
+</mapper>

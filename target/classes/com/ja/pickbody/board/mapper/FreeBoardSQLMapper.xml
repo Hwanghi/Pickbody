@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.board.mapper.FreeBoardSQLMapper">
+
+<select id="createfreePK" resultType="int">
+select PB_Board_Free_seq.nextval FROM Dual
+</select>
+
+<insert id="freeWriteContent">
+INSERT INTO PB_Board_Free VALUES(
+#{free_no},
+#{member_no},
+#{free_title},
+#{free_content},
+SYSDATE,
+0
+)
+</insert>
+<insert id="freeRippleContent">
+INSERT INTO PB_Board_ripple VALUES(
+PB_Board_ripple_seq.nextval,
+#{free_no},
+#{member_no},
+#{ripple_content},
+SYSDATE
+)
+</insert>
+
+<select id="getList" resultType="com.ja.pickbody.vo.FreeBoardVo">
+SELECT * FROM PB_Board_free ORDER BY free_no DESC
+</select>
+<select id="getFreeBoardByNo" resultType="com.ja.pickbody.vo.FreeBoardVo">
+SELECT * FROM PB_Board_free WHERE free_no = #{no}
+</select>
+<delete id="deleteByNo">
+DELETE FROM PB_Board_free WHERE free_no = #{no}
+</delete>
+<update id="update">
+		UPDATE PB_Board_free 
+		SET free_title = #{free_title}, 
+		free_content = #{free_content}
+		WHERE free_no = #{free_no}		
+</update>
+<update id="increaseReadCount">
+		UPDATE PB_Board_free 
+		SET free_view = free_view + 1
+		WHERE free_no = #{no}
+	</update>
+
+<select id="getFreeRippleByNo" resultType="com.ja.pickbody.vo.RippleVo">
+SELECT * FROM PB_Board_ripple WHERE ripple_no=#{no}
+</select>
+<select id="rippleRead" resultType="com.ja.pickbody.vo.RippleVo">
+SELECT * FROM PB_Board_ripple where free_no=#{free_no}
+</select>
+<delete id="deleteFreeRippleByNo">
+DELETE FROM PB_Board_ripple WHERE ripple_no=#{no}
+</delete>
+<update id="updateFreeRipple">
+Update PB_Board_ripple
+SET ripple_content=#{ripple_content}
+WHERE ripple_no=#{ripple_no}
+</update>
+<!-- 이미지 -->
+<insert id ="freeImage">
+INSERT INTO PB_free_image VALUES(
+PB_free_image_seq.nextval,
+#{free_no},
+#{image_link},
+#{image_original_filename}
+)
+</insert>
+<select id="getFreeImagesByNo" resultType="com.ja.pickbody.vo.FreeImageVo">
+SELECT * FROM PB_free_image WHERE free_no=#{free_no}
+</select>
+<insert id ="freeLike">
+INSERT INTO PB_free_like VALUES(
+PB_free_like_seq.nextval,
+#{member_no},
+#{free_no},
+SYSDATE
+)
+</insert>
+<delete id="freeDislike">
+DELETE FROM PB_free_like
+WHERE member_no=#{member_no} AND free_no=#{free_no}
+</delete>
+<select id="myFreeLikeCount" resultType="int">
+SELECT COUNT (*) FROM PB_free_like
+WHERE member_no=#{member_no} AND free_no=#{free_no}
+</select>
+<select id="totalFreeLikeCount" resultType="int">
+SELECT COUNT(*) FROM PB_free_like WHERE free_no=#{free_no}
+</select>
+<select id="RippleAmount" resultType="int">
+SELECT COUNT(*) FROM PB_Board_ripple WHERE free_no=#{free_no}
+</select>
+<select id="BestFreeViewBoard" resultType="com.ja.pickbody.vo.FreeBoardVo">
+SELECT rnum.* FROM(SELECT * FROM PB_Board_Free WHERE TO_CHAR(free_date ,'yyyy/mm/dd')=TO_CHAR(sysdate ,'yyyy/mm/dd') ORDER BY free_view DESC) rnum <![CDATA[WHERE rownum <4]]>
+</select>
+</mapper>

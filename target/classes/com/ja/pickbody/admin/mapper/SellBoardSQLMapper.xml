@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.admin.mapper.SellBoardSQLMapper">
+
+<!-- 판매게시판 PK생성 -->
+	<select id="createSellBoardPK" resultType="int">
+		SELECT PB_SellBoard_seq.nextval FROM Dual
+	</select>
+<!-- 판매게시판 리스트 출력 -->
+	<select id="getSellList" resultType="com.ja.pickbody.vo.SellBoardVo">
+		select * from PB_SellBoard order by sell_no DESC
+	</select>
+	
+<!-- 판매게시판 글 상세보기 -->
+	<select id="readSellBoard" resultType="com.ja.pickbody.vo.SellBoardVo">
+	SELECT * FROM PB_SEllBoard where sell_no = #{no}
+	</select>
+
+	<!-- 상품등록 게시판 글 쓰기 -->
+	<insert id ="writeSellBoard">
+	INSERT INTO PB_SellBoard VALUES(
+	#{sell_no},
+	#{admin_no},
+	#{sell_name},
+	#{sell_content},
+	#{sell_price},
+	SYSDATE,
+	#{sell_Quantity},
+	0
+	)
+	</insert>
+	<!-- 상품등록게시판 이미지등록 -->
+	<insert id="SellBoardImage">
+	INSERT INTO PB_SellBoard_image VALUES(
+	    PB_SellBoard_image_seq.nextval,
+	    #{sell_no},
+	    #{sellImage_link},
+	    #{sellImage_original_filename}
+	)
+	</insert>
+		<select id="getSellBoardList" resultType="com.ja.pickbody.vo.SellBoardVo">
+		SELECT *
+		FROM PB_SellBoard
+		ORDER BY sell_no DESC
+	</select>
+	
+	<select id="getSellImagesBySellNo" resultType="com.ja.pickbody.vo.SellImageVo">
+		SELECT *
+		FROM PB_SellBoard_image
+		WHERE sell_no = #{no}
+		</select>
+	<!-- 판매게시판 첫번째로 출력 -->
+		<select id="getSellImageByRownum" resultType="com.ja.pickbody.vo.SellImageVo">
+		SELECT *
+		FROM PB_SellBoard_image
+		WHERE sell_no = #{no} AND ROWNUM=1
+	</select>
+		
+		<!-- 판매게시판 수정 -->
+	<update id="updateSellBoard">
+		UPDATE PB_SellBoard
+		SET sell_name = #{sell_name},
+			sell_content = #{sell_content},
+			sell_price = #{sell_price}
+		WHERE sell_no = #{sell_no}
+	</update>
+		<!-- 판매게시판 삭제 -->
+	<delete id="deleteSellboard">
+	delete from PB_SellBoard where sell_no = #{no}
+	</delete>
+	
+	<update id="sellincreaseview">
+	update PB_SellBoard
+	set sell_view = sell_view +1
+	where sell_no = #{no}
+	</update>
+	
+	
+	
+	</mapper>

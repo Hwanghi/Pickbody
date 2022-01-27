@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ja.pickbody.member.mapper.MyPageSQLMapper">
+
+	<!-- 회원 정보 수정 -->
+	<update id="updateMemberInfo">
+		UPDATE PB_Member
+		SET member_address = #{member_address},
+			member_phone = #{member_phone},
+			member_email = #{member_email}
+		WHERE member_no= #{member_no}
+	</update>
+	
+	<!-- 회원 닉네임 수정 -->
+	<update id="updateMemberNick">
+		UPDATE PB_Member
+		SET member_nick = #{member_nick}
+		WHERE member_no = #{member_no}
+	</update>
+	
+	<!-- 회원 프로필사진 -->
+	<!-- 회원 프로필 사진 등록 -->
+	<insert id="registerMemberProfileImage">
+		INSERT INTO PB_Member_Profile_Image VALUES(
+		    PB_Member_Profile_Image_seq.nextval,
+		    #{member_no},
+		    #{image_link},
+		    #{image_original_filename}
+		)
+	</insert>
+	<!-- 회원 프로필 사진 출력 -->
+	<select id="getMemberProfileImageByNo" resultType="com.ja.pickbody.vo.MemberProfileImageVo">
+		SELECT * FROM PB_Member_Profile_Image WHERE member_no = #{member_no}
+	</select>
+	
+	<!-- 회원 프로필 사진 삭제 -->
+	<delete id="deleteMemberProfileImageByNo">
+		DELETE FROM PB_Member_Profile_Image WHERE member_no = #{member_no}
+	</delete>
+		
+	<!-- 회원 프로필 사진 수정 -->
+	<update id="updateMemberProfileImage">
+		UPDATE PB_Member_Profile_Image
+		SET image_link = #{image_link}, image_original_filename = #{image_original_filename}
+		WHERE member_no = #{member_no}
+	</update>
+
+	<!-- 회원 프로필 사진 있나 없나 -->
+	<select id="countMemberProfileImage" resultType="int">
+		SELECT COUNT(*) FROM PB_Member_Profile_Image WHERE member_no = #{member_no}
+	</select>
+	
+	<!-- 인바디 입력 -->
+	<insert id="writeInbody">
+	INSERT INTO PB_Member_Inbody VALUES(
+	    PB_Member_Inbody_seq.nextval,
+	    #{member_no},
+	    #{inbody_stature},
+	    #{inbody_weight},
+	    #{inbody_skeletalmusclemass},
+	    #{inbody_bodyfatmass},
+	    #{inbody_measureddate},
+	    SYSDATE
+    )
+	</insert>
+	
+	<!-- 인바디 리스트 출력 ByMemberNo -->
+	<select id="getInbodyListByMemberNo" resultType="com.ja.pickbody.vo.MemberInbodyVo">
+		SELECT i.*
+		FROM(SELECT *
+			FROM PB_Member_Inbody
+			WHERE member_no= #{member_no} ORDER BY inbody_measureddate DESC) i
+		<![CDATA[WHERE ROWNUM<7]]>
+		ORDER BY inbody_measureddate ASC
+	</select>
+	
+	<!-- 인바디 행 삭제 -->
+	<delete id="deleteInbody">
+		DELETE
+		FROM PB_Member_Inbody
+		WHERE inbody_no = #{no}
+	</delete>
+	
+	<!-- 인바디 수정 -->
+	<update id="updateInbody">
+		UPDATE PB_Member_Innbody
+		SET inbody_measureddate = #{inbody_measureddate},
+			inbody_stature = #{inbody_stature},
+			inbody_weight = #{inbody_weight},
+			inbody_skeletalmusclemass = #{inbody_skeletalmusclemass},
+			inbody_bodyfatmass = #{inbody_bodyfatmass}
+		WHERE inbody_no = #{no}
+	</update>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.board.mapper.BodygoodBoardSQLMapper">
+
+<select id="createBodygoodPK" resultType="int">
+	select PB_Board_Bodygood_seq.nextval from dual
+</select>
+
+
+<insert id="BodygoodWriteContent">
+	insert into PB_Board_Bodygood values(
+    #{bodygood_no},
+    #{member_no},
+    #{bodygood_title},
+    #{bodygood_content},
+    SYSDATE,
+    0   
+)
+</insert>
+
+<select id="getList" resultType="com.ja.pickbody.vo.BodygoodVo">
+	select * from PB_Board_Bodygood order by bodygood_no DESC
+</select>
+
+<select id="getBodygoodByNo" resultType="com.ja.pickbody.vo.BodygoodVo">
+select * from PB_Board_Bodygood where bodygood_no = #{no}
+</select>
+
+<delete id="bodygooddeleteByNo">
+	delete from PB_board_Bodygood where bodygood_no = #{no}
+</delete>
+
+<update id="bodygoodupdate">
+	update pb_board_bodygood set bodygood_title = #{bodygood_title},
+	bodygood_content = #{bodygood_content}
+	where bodygood_no = #{bodygood_no}
+</update>
+
+<update id="bodygoodincreaseView">
+	update pb_board_bodygood set bodygood_view = bodygood_view +1
+	where bodygood_no = #{no}
+</update>
+
+<!-- 이미지 관련 -->
+
+<insert id="registerImage">
+	insert into PB_Bodygood_Image values(
+	PB_Bodygood_Image_SEQ.nextval,
+    #{bodygood_no},
+    #{image_link},
+    #{image_original_filename}
+)
+</insert>
+
+<select id="getBodygoodImagesByBodygoodNo" resultType="com.ja.pickbody.vo.BodygoodImageVo">
+	select * from pb_bodygood_image where bodygood_no = #{bodygoodNo}
+</select>
+
+<!-- 판매게시판 첫번째로 출력 -->
+		<select id="getBodygoodImageByRownum" resultType="com.ja.pickbody.vo.BodygoodImageVo">
+		SELECT *
+		FROM PB_bodygood_image
+		WHERE bodygood_no = #{no} AND ROWNUM=1
+	</select>
+
+<!-- 댓글 관련 -->
+
+<select id="bodygoodReadComment" resultType="com.ja.pickbody.vo.BodygoodCommentVo">
+select * from PB_Bodygood_Comment where bodygood_no = #{bodygood_no} 
+
+</select>
+
+<insert id="bodygoodWriteComment">
+ 	insert into PB_Bodygood_Comment values(
+    PB_Bodygood_Comment_SEQ.nextval,
+    #{bodygood_no},
+    #{member_no},
+    #{comment_content},
+    SYSDATE
+)
+</insert>
+
+<!-- 글옆에 댓글 갯수 나오게하기 -->
+<select id="bodygoodtotalComment" resultType="int">
+SELECT COUNT(*) FROM PB_Bodygood_comment WHERE bodygood_no= #{bodygood_no}
+</select>
+
+<!-- 좋아요 관련-->
+<insert id="bodygoodLike">
+	insert into PB_bodygood_like values(
+	PB_BODYGOOD_LIKE_SEQ.nextval,
+	#{member_no},
+	#{bodygood_no},
+	SYSDATE
+	)
+</insert>
+
+<delete id="bodygoodunLike">
+delete from PB_bodygood_like
+where member_no=#{member_no} and bodygood_no=#{bodygood_no}
+</delete>
+
+<select id="myLikeCount" resultType="int">
+select count(*) from PB_bodygood_like
+where member_no=#{member_no} and bodygood_no=#{bodygood_no}
+</select>
+
+<select id="totalLikecount" resultType="int">
+select count(*) from PB_bodygood_like where bodygood_no=#{bodygood_no}
+</select>
+
+<!-- 조회수가 높으순으로 인기글 출력  CDATA: 렇게 선언하고 안에 문자열을 채워 넣으면 , [ ] 안에 있는 문장은 파싱되지 않고 그대로 문자열로 출력된다.-->
+<select id="bestview" resultType="com.ja.pickbody.vo.BodygoodVo">
+SELECT rnum.* FROM(SELECT * FROM PB_board_bodygood
+WHERE TO_CHAR(bodygood_date ,'yyyy/MM/dd')
+=TO_CHAR(sysdate ,'yyyy/MM/dd')
+ORDER BY bodygood_view DESC) rnum <![CDATA[WHERE rownum <4]]>
+</select>
+
+
+
+
+
+
+
+
+
+</mapper>

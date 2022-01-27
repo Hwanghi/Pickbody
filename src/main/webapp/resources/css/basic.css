@@ -1,0 +1,118 @@
+@charset "UTF-8";
+ul, ol, li {
+  list-style: none;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif !important;
+}
+
+div, span, li, a{
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.menu {
+  color: black;
+  text-shadow: 1px 1px 2px #000000;
+}
+
+.menu :hover {
+  color:  #F25C19;
+}
+
+a, a:hover, a:focus, a:active {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.pointer-text {
+  cursor: pointer;
+}
+
+.font-gray {
+  color: #F2F2F2;
+}
+
+.background-gray {
+  background-color: #F2F2F2;
+}
+
+.font-darkgray {
+  color: #BEBEBE;
+}
+
+.background-darkgray {
+  background-color: #BEBEBE;
+}
+
+.font-orange {
+	color:  #F25C19;
+}
+
+.font-orange :hover {
+	color:  #DB3607;
+}
+
+.background-orange {
+	background-color:  #F25C19;
+}
+
+.font-blue {
+	color:  #BDE2EA;
+}
+
+.background-blue {
+	background-color:  #BDE2EA;
+}
+
+.font-red {
+	color: #DB3607;
+}
+
+.background-red {
+	background-color: #DB3607;
+}
+
+.font-yellow {
+	color:#F2CB05;
+}
+
+.background-yellow {
+  background-color: #F2CB05;
+}
+
+.font-dark-yellow {
+	color:#F2B705;
+}
+
+.background-dark-yellow {
+  background-color: #F2B705;
+}
+
+.disable {
+  color: #F2F2F2;
+  pointer-events: none;
+}
+
+.light {
+  font-weight: 300;
+}
+
+.regular {
+  font-weight: 400;
+}
+
+.medium {
+  font-weight: 500;
+}
+
+.bold {
+  font-weight: 700;
+  font-style: italic;
+}
+
+.card-body {
+	z-index:1000;
+}
+

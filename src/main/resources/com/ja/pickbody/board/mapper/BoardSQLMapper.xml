@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.board.mapper.BoardSQLMapper">
+
+	
+
+	<delete id="deleteByNo">
+		DELETE FROM FP_Board WHERE board_no = #{no}
+	</delete>
+
+	<update id="update">
+		UPDATE FP_Board 
+		SET board_title = #{board_title}, 
+		board_content = #{board_content}
+		WHERE board_no = #{board_no}		
+	</update>
+
+</mapper>

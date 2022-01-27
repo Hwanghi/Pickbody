@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+.sidenav {
+	width: 330px;
+	height: 100%;
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	overflow-x: hidden;
+	background: rgba(33, 33, 33, 0.72);
+	row-gap: 1rem;
+    transition: all 0.3s linear;
+    transform: translate(-150%);
+}
+
+.sidebar-toggle {
+	position: fixed;
+	top: 2rem;
+	right: 3rem;
+	font-size: 2rem;
+	background: transparent;
+	border-color: transparent;
+	color: hsl(205, 78%, 60%);
+	transition: all 0.3s linear;
+	cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+	color: hsl(205, 90%, 76%);
+}
+
+.close-btn {
+	color: white;
+}
+
+.show-sidebar {
+  transform: translate(0%);
+}
+
+.logoutBtn {
+	transform: translateY(-120%);	
+}

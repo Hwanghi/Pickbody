@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ja.pickbody.board.mapper.BuyBoardSQLMapper">
+
+
+<!-- 구매 -->
+<insert id="registerBuyer">
+insert into PB_buyBoard VALUES(
+PB_BuyBoard_seq.nextval,
+#{member_no},
+#{sell_no},
+#{buy_Quantity},
+#{buy_adress},
+SYSDATE,
+#{buy_price},
+#{buy_memo}
+)
+</insert>
+<!-- 구매자 리스트 -->
+<select id="BuyerList" resultType="com.ja.pickbody.vo.BuyBoardVo">
+select * from PB_buyBoard ORDER BY buy_no DESC
+</select>
+<!-- 리플 갯수 출력 -->
+<select id="getAmountReview" resultType="int">
+SELECT COUNT(*) FROM PB_BuyBoard_review WHERE sell_no=#{sell_no}
+</select>
+<!-- 좋아요 -->
+<insert id="buylike">
+insert into PB_BuyBoard_buylike VALUES(
+PB_BuyBoard_buylike_seq.nextval,
+#{member_no},
+#{sell_no},
+SYSDATE
+)
+</insert>
+<delete id="disbuylike">
+DELETE FROM PB_BuyBoard_buylike
+WHERE member_no=#{member_no} AND sell_no=#{sell_no}
+</delete>
+<select id="mybuylikeCount" resultType="int">
+SELECT COUNT (*) FROM PB_BuyBoard_buylike
+WHERE member_no=#{member_no} AND sell_no=#{sell_no}
+</select>
+<select id="totalbuylikeCount" resultType="int">
+SELECT COUNT(*) FROM PB_BuyBoard_buylike WHERE sell_no=#{sell_no}
+</select>
+<!-- 댓글 -->
+<insert id="buyQna">
+insert into PB_BuyBoard_buyqna VALUES(
+PB_BuyBoard_buyqna_seq.nextval,
+#{sell_no},
+#{member_no},
+#{buyqna_content},
+sysdate
+)
+</insert>
+<select id="getBuyQnaByNo" resultType="com.ja.pickbody.vo.BuyQnaVo">
+SELECT * FROM PB_BuyBoard_buyqna WHERE buyqna_no=#{no}
+</select>
+<select id="BuyQnaRead" resultType="com.ja.pickbody.vo.BuyQnaVo">
+SELECT * FROM PB_BuyBoard_buyqna WHERE sell_no=#{sell_no}
+</select>
+<delete id="deleteBuyQnaByNo">
+DELETE FROM PB_BuyBoard_buyqna WHERE buyqna_no=#{no}
+</delete>
+<update id="updateBuyQna">
+Update PB_BuyBoard_buyqna
+SET buyqna_content=#{buyqna_content}
+WHERE buyqna_no=#{buyqna_no}
+</update>
+<!-- 장바구니 -->
+<insert id="willBuy">
+insert into PB_willBuy VALUES(
+PB_willBuy_seq.nextval,
+#{member_no},
+#{sell_no},
+#{willBuy_amount},
+#{willBuy_price}
+)
+</insert>
+<select id="willBuyList" resultType="com.ja.pickbody.vo.WillBuyVo">
+select * from PB_WillBuy ORDER BY willBuy_no DESC
+</select>
+<delete id="deleteWillBuy">
+DELETE FROM PB_willBuy WHERE willBuy_no=#{no}
+</delete>
+<insert id="Review">
+insert into PB_BuyBoard_review VALUES(
+#{review_no},
+#{sell_no},
+#{member_no},
+#{review_star},
+#{review_content},
+sysdate
+)
+</insert>
+<select id="reviewPK" resultType="int">
+select PB_BuyBoard_review_seq.nextval FROM Dual
+</select>
+
+<select id="getReviewByNo" resultType="com.ja.pickbody.vo.ReviewVo">
+SELECT * FROM PB_BuyBoard_review WHERE review_no=#{no}
+</select>
+<select id="reviewRead" resultType="com.ja.pickbody.vo.ReviewVo">
+SELECT * FROM PB_BuyBoard_review WHERE sell_no=#{sell_no}
+</select>
+<delete id="deleteReviewByNo">
+DELETE FROM PB_BuyBoard_review WHERE review_no=#{no}
+</delete>
+<update id="updateReview">
+Update PB_BuyBoard_review
+SET review_content=#{review_content}
+WHERE review_no=#{review_no}
+</update>
+
+<select id="getReviewStar" resultType="com.ja.pickbody.vo.ReviewVo">
+select review_star From PB_BuyBoard_review WHERE review_no=#{no}
+</select>
+
+
+</mapper>

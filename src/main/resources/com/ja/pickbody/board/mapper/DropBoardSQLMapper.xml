@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ja.pickbody.board.mapper.DropBoardSQLMapper">
+
+
+	<!-- 드랍게시판 리스트 출력 -->
+	<select id="getBoardDropList" resultType="com.ja.pickbody.vo.BoardDropVo">
+		SELECT *
+		FROM PB_Board_Drop
+		ORDER BY drop_no DESC
+	</select>
+	
+	<!-- 드랍게시만 상세 보기 -->
+	<select id="getBoardDropByNo" resultType="com.ja.pickbody.vo.BoardDropVo">
+		SELECT *
+		FROM PB_Board_Drop
+		WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 드랍게시판 이미지 -->
+	<select id="getBoardDropImagesByDropNo" resultType="com.ja.pickbody.vo.BoardDropImageVo">
+		SELECT *
+		FROM PB_Board_Drop_Image
+		WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getBoardDropImageByRownum" resultType="com.ja.pickbody.vo.BoardDropImageVo">
+		SELECT *
+		FROM PB_Board_Drop_Image
+		WHERE drop_no = #{no} AND ROWNUM=1
+	</select>
+	
+	<!-- 응모(댓글) -->
+	<!-- 응모(댓글) 작성쿼리 -->
+	<insert id="dropApplication">
+	INSERT INTO PB_Application VALUES(
+	    PB_Application_seq.nextval,
+	    #{drop_no},
+	    #{member_no},
+	    #{application_comment},
+	    SYSDATE
+	)
+	</insert>
+	
+	<!-- 응모 할 때 포인트 차감 -->
+	<update id="dropPointMinus">
+		UPDATE PB_Member
+		SET member_point=member_point-#{drop_price}
+		WHERE member_no=#{member_no}
+	</update>
+	
+	<!-- 응모 출력 -->
+	<select id="getDropApplicationListByDropNo" resultType="com.ja.pickbody.vo.ApplicationVo">
+	SELECT *
+	FROM PB_Application
+	WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getDropApplicationByDropNo" resultType="com.ja.pickbody.vo.ApplicationVo">
+	SELECT *
+	FROM PB_Application
+	WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 내가 특정 글에 응모를 햇나 안했나 -->
+	<select id="myApplicationCount" resultType="int">
+	SELECT COUNT(*)
+	FROM PB_Application
+	WHERE member_no = #{member_no} AND drop_no = #{drop_no}
+	</select>
+	
+	<!--특정 드랍의 응모한 사람들 횟수  -->
+	<select id="totalApplicationCount" resultType="int">
+	SELECT COUNT(*)
+	FROM PB_Application
+	WHERE drop_no = #{drop_no}
+	</select>
+	
+	<!-- 특정 드랍게시판 수량  -->
+	<select id="getDropAmount" resultType="int">
+	SELECT drop_amount
+	FROM PB_Board_Drop
+	WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 당첨자 입력 -->
+	<!--당첨자 번호 -->
+	<select id="pickWinningNumber" resultType="com.ja.pickbody.vo.ApplicationVo">
+	SELECT w2.*
+	FROM (SELECT ROWNUM as rnum, w1.*
+		FROM (SELECT *
+			FROM PB_Application WHERE drop_no=#{drop_no} ORDER BY application_no) w1) w2
+	WHERE rnum=#{rnum}
+	</select>
+	
+	
+	<select id="createWinningPk" resultType="int">
+	SELECT PB_List_Winning_seq.nextval FROM DUAL
+	</select>
+	
+	<insert id="registWinningMember">
+	INSERT INTO PB_List_Winning VALUES(
+  	#{winning_no},
+    #{drop_no},
+    #{member_no}
+	)
+	</insert>
+	
+	<!-- 당첨자 특정 드랍 당첨자 출력 -->
+	<select id="getWinningMember" resultType="com.ja.pickbody.vo.WinningListVo">
+	SELECT *
+	FROM PB_List_Winning
+	WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getWinning" resultType="com.ja.pickbody.vo.WinningListVo">
+	SELECT *
+	FROM PB_List_Winning
+	WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 오늘날짜와 마감날짜가 같은 drop 검색 -->
+	<select id="enddateEqualSysdate" resultType="com.ja.pickbody.vo.BoardDropVo">
+	SELECT * FROM PB_Board_Drop WHERE TO_CHAR(drop_enddate, 'YYYY-MM-DD') = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+	</select>
+</mapper>

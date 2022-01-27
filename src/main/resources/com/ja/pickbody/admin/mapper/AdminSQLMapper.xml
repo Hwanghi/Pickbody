@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.admin.mapper.AdminSQLMapper">
+
+	<!-- 로그인 process -->
+	<select id="getAdminByIdAndPw" resultType="com.ja.pickbody.vo.AdminVo">
+	
+		SELECT *
+		FROM PB_Admin
+		WHERE
+			admin_id = #{admin_id} AND admin_pw = #{admin_pw}	
+	</select>
+	
+	<!-- 음식 관련 -->
+	<!-- 음식 등록 -->
+	<insert id="registFoodCategory">
+	INSERT INTO PB_Food_Category VALUES(
+    food_category_no_seq.nextval,
+    #{food_category_name},
+    #{food_category_unit}
+	)
+	</insert>
+	<!-- 음식 출력 -->
+	<select id="getFoodCategory" resultType="com.ja.pickbody.vo.FoodCategoryVo">
+		SELECT * FROM PB_Food_Category
+	</select>
+	<!-- 음식 수정 -->
+	<update id="updateFoodCategory">
+		UPDATE PB_Food_Category
+		SET food_category_name = #{food_category_name},
+		food_category_unit = #{food_category_unit}
+		WHERE food_category_no = #{food_category_no}
+	</update>
+	<!-- 음식 삭제 -->
+	<delete id="deleteFoodCategoryByNo">
+		DELETE FROM PB_Food_Category WHERE food_category_no = #{no}
+	</delete>
+	
+	<!-- 운동 관련 -->
+	<!-- 운동 등록 -->
+	<insert id="registExerciseCategory">
+	INSERT INTO PB_Exercise_Category VALUES(
+    PB_Exercise_Category_seq.nextval,
+    #{exercise_category_name},
+    #{exercise_category_link}
+	)
+	</insert>
+	<!-- 음식 출력 -->
+	<select id="getExerciseCategory" resultType="com.ja.pickbody.vo.ExerciseCategoryVo">
+		SELECT * FROM PB_Exercise_Category
+	</select>
+	<!-- 음식 수정 -->
+	<update id="updateExerciseCategory">
+		UPDATE PB_Exercise_Category
+		SET exercise_category_name = #{exercise_category_name},
+		exercise_category_link = #{exercise_category_link}
+		WHERE exercise_category_no = #{exercise_category_no}
+	</update>
+	<!-- 음식 삭제 -->
+	<delete id="deleteExerciseCategoryByNo">
+		DELETE FROM PB_Exercise_Category WHERE exercise_category_no = #{no}
+	</delete>
+	
+	
+	<!-- 드랍게시판 관련 -->
+	<!-- 드랍게시판 PK생성 -->
+	<select id="createBoardDropPK" resultType="int">
+		SELECT PB_Board_Drop_seq.nextval FROM Dual
+	</select>
+	
+	<!-- 드랍게시판 글 쓰기 -->
+	<insert id="writeBoardDrop">
+	INSERT INTO PB_Board_Drop VALUES(
+	    #{drop_no},
+	    #{drop_title},
+	    #{drop_content},
+	    #{drop_amount},
+	    #{drop_price},
+	    #{drop_startdate},
+	    #{drop_enddate},
+	    SYSDATE
+	)
+	</insert>
+	<!-- 드랍게시판 리스트 출력 -->
+	<select id="getBoardDropList" resultType="com.ja.pickbody.vo.BoardDropVo">
+		SELECT *
+		FROM PB_Board_Drop
+		ORDER BY drop_no DESC
+	</select>
+	
+	<!-- 드랍게시만 상세 보기 -->
+	<select id="getBoardDropByNo" resultType="com.ja.pickbody.vo.BoardDropVo">
+		SELECT *
+		FROM PB_Board_Drop
+		WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 드랍게시판 글 삭제 -->
+	<delete id="deleteBoardDropByNo">
+		DELETE FROM PB_Board_Drop
+		WHERE drop_no = #{no}
+	</delete>
+	
+	<!-- 드랍게시판 수정 -->
+	<update id="updateBoardDrop">
+		UPDATE PB_Board_Drop
+		SET drop_title = #{drop_title},
+		    drop_content = #{drop_content},
+		    drop_amount = #{drop_amount},
+		    drop_price = #{drop_price},
+		    drop_startdate = #{drop_startdate},
+		    drop_enddate = #{drop_enddate}
+		WHERE drop_no = #{drop_no}
+	</update>
+	
+	
+	<!-- 드랍게시판 이미지등록 -->
+	<insert id="registImage">
+	INSERT INTO PB_Board_Drop_Image VALUES(
+	    PB_Board_Drop_Image_seq.nextval,
+	    #{drop_no},
+	    #{image_link},
+	    #{image_original_filename}
+	)
+	
+	</insert>
+	
+	<select id="getBoardDropImagesByDropNo" resultType="com.ja.pickbody.vo.BoardDropImageVo">
+		SELECT *
+		FROM PB_Board_Drop_Image
+		WHERE drop_no = #{no}
+	</select>
+	<select id="getDropApplicationListByDropNo" resultType="com.ja.pickbody.vo.ApplicationVo">
+	SELECT *
+	FROM PB_Application
+	WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getDropApplicationByDropNo" resultType="com.ja.pickbody.vo.ApplicationVo">
+	SELECT *
+	FROM PB_Application
+	WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getBoardDropImageByRownum" resultType="com.ja.pickbody.vo.BoardDropImageVo">
+		SELECT *
+		FROM PB_Board_Drop_Image
+		WHERE drop_no = #{no} AND ROWNUM=1
+	</select>
+	
+	<!-- 내가 특정 글에 응모를 햇나 안했나 -->
+	<select id="myApplicationCount" resultType="int">
+	SELECT COUNT(*)
+	FROM PB_Application
+	WHERE member_no = #{member_no} AND drop_no = #{drop_no}
+	</select>
+	
+	<!--특정 드랍의 응모한 사람들 횟수  -->
+	<select id="totalApplicationCount" resultType="int">
+	SELECT COUNT(*)
+	FROM PB_Application
+	WHERE drop_no = #{drop_no}
+	</select>
+	
+	<!-- 특정 드랍게시판 수량  -->
+	<select id="getDropAmount" resultType="int">
+	SELECT drop_amount
+	FROM PB_Board_Drop
+	WHERE drop_no = #{no}
+	</select>
+	
+	<select id="getWinningMember" resultType="com.ja.pickbody.vo.WinningListVo">
+	SELECT *
+	FROM PB_List_Winning
+	WHERE drop_no = #{no}
+	</select>
+	
+	<!-- 어드민 정보 가져오기 -->
+	<select id="getAdminByNo" resultType="com.ja.pickbody.vo.AdminVo">
+		SELECT * FROM PB_Admin WHERE admin_no = #{admin_no}
+	</select>
+	<!-- 회원 관리 -->
+	<!-- 회원 리스트 가져오기 -->
+	<select id="getMemberList" resultType="com.ja.pickbody.vo.MemberVo">
+		SELECT * FROM PB_Member
+	</select>
+	<!-- 회원 로그인 금지 목록 -->
+	<select id="getMemberInhibitionByMemberNo" resultType="com.ja.pickbody.vo.MemberInhibitionVo">
+		SELECT * FROM PB_Member_inhibition WHERE member_no = #{member_no}
+	</select>
+	<select id="countMemberInhibitionByNo" resultType="int">
+		SELECT COUNT(*) FROM PB_Member_inhibition WHERE member_no = #{member_no}
+	</select>
+	<!-- 회원 로그인 금지 등록 -->
+	<insert id="resistMemberInhibition">
+		INSERT INTO PB_Member_inhibition VALUES(
+    	PB_Member_inhibition_seq.nextval,
+    	#{member_no},
+    	SYSDATE + #{day},
+    	SYSDATE
+		)
+	</insert>
+	<!-- 회원 로그인 금지 추가 -->
+	<update id="additionMemberInhibition">
+		UPDATE PB_Member_inhibition
+		SET inhibition_date = inhibition_date + #{day}
+		WHERE member_no = #{member_no}
+	</update>
+	<!-- 회원 로그인 금지 해제 -->
+	<delete id="deleteMemberInhibition">
+		DELETE FROM PB_Member_inhibition WHERE <![CDATA[inhibition_date < SYSDATE]]>
+	</delete>
+	
+	<!-- 사이트 통계 -->
+	<!-- 최근 일주일 회원 가입자 -->
+	<select id="lastestJoinMemberByWeek">
+		SELECT * FROM PB_Member WHERE SYSDATE-7 <![CDATA[< TRUNC(TO_DATE(member_joindate, 'YY-MM-DD'), 'DD')]]>
+	</select>
+	<!-- 특정 날짜 별 회원 가입자 수 -->
+	<select id="joinMemberCountByDate" resultType="int">
+		SELECT NVL(COUNT(*),0) as joinMemberCount
+		FROM(SELECT *
+			FROM PB_Member
+			WHERE TRUNC(TO_DATE(member_joindate, 'YY-MM-DD'), 'DD') = TRUNC(TO_DATE(#{date}, 'YY-MM-DD'), 'DD')) t1
+	</select>
+	
+
+	<!-- 특정 날짜 별 소모 포인트 -->
+	<select id="pointSumByDate" resultType="int">
+		SELECT NVL(SUM(h1.point_history_amount),0) as pointsum
+			FROM(
+				SELECT *
+				FROM PB_Member_Point_History
+				WHERE TRUNC(TO_DATE(point_history_date, 'YY-MM-DD'), 'DD') = TRUNC(TO_DATE(#{date}, 'YY-MM-DD'), 'DD')
+							AND NOT point_history_useway = '충전') h1
+
+	</select>
+	
+	
+	
+	<!-- PT매칭 수 상위 5강사 정보 -->
+	<select id="precedenceFiveTrainner" resultType="com.ja.pickbody.vo.TrainerVo">
+		SELECT * FROM PB_Trainer pbt
+		WHERE pbt.trainer_no IN(
+		SELECT t2.trainer_no FROM (
+		    SELECT * FROM(
+		        SELECT ptp.trainer_no , COUNT(*) as cnt FROM PB_PT_Program ptp
+		        GROUP BY ptp.trainer_no
+		    ) t1
+		    ORDER BY t1.CNT DESC
+		) t2
+		<![CDATA[WHERE ROWNUM <= 3]]>
+		)
+	</select>
+	<!-- 강사 자격증  검색 -->
+	<select id="getTrainerCertificationByNo" resultType="com.ja.pickbody.vo.TrainerCertificationVo">
+		SELECT *
+		FROM PB_Trainer_Certification
+		WHERE trainer_no = #{trainer_no}
+	</select>
+	
+	<!-- 강사 수상내역 검색 -->
+	<select id="getTrainerPrizeByNo" resultType="com.ja.pickbody.vo.TrainerPrizeVo">
+		SELECT *
+		FROM PB_Trainer_Prize
+		WHERE trainer_no = #{trainer_no}
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.pickbody.member.mapper.MemberSQLMapper">
+
+	<select id="createMemberPK" resultType="int">
+		SELECT PB_Member_seq.nextval FROM Dual
+	</select>
+
+	<insert id="registerMember">
+		INSERT INTO PB_Member VALUES(
+		    #{member_no},
+		    #{member_id},
+		    #{member_pw},
+		    #{member_name},
+		    #{member_nick},
+		    #{member_gender},
+		    #{member_birth},
+		    #{member_address},
+		    #{member_phone},
+		    #{member_email},
+		    SYSDATE,
+		    #{member_point}
+		)
+	</insert>
+	<!-- 회원 프로필 사진 -->
+	<insert id="addProfileImage">
+		INSERT INTO PB_Member_Profile_Image VALUES(
+			PB_Member_Profile_Image_seq.nextval,
+			#{member_no},
+			#{image_link},
+			#{image_original_filename}
+		)
+	</insert>
+	<select id="getProfileImageByMemberNo" resultType="com.ja.pickbody.vo.MemberProfileImageVo">
+		SELECT * FROM PB_Member_Profile_Image 
+		WHERE member_no = #{memberNo}
+	</select>
+	
+	<!-- 회원 목표 부분 -->
+	<insert id="addGoalCategory">
+		INSERT INTO PB_Member_Goal 
+		VALUES (
+			PB_Member_Goal_seq.nextval,
+			#{memberNo},
+			#{goalCategoryNo}
+		)
+	</insert>
+	<select id="getGoalCategoryList" resultType="com.ja.pickbody.vo.GoalCategoryVo">
+		SELECT * FROM PB_Goal_Category
+	</select>
+	
+	<!-- 회원 포인트 충전 -->
+	<update id="chargeMemberPoint">
+	UPDATE PB_Member
+	SET member_point = member_point + #{point}
+	WHERE member_no= #{member_no}
+	</update>
+	
+	<!--회원 포인트 차감 -->
+	<update id="deductionMemberPoint">
+	update PB_Member
+	SET member_point = member_point - #{point}
+	WHERE member_no = #{member_no}
+	</update>
+	
+	<!-- 회원 포인트 내역 -->
+	<!-- 회원 포인트 내역 입력 -->
+	<insert id="writePlusMemberPointHistory">
+	INSERT INTO PB_Member_Point_History VALUES(
+		PB_Member_Point_History_seq.nextval,
+    	#{member_no},
+    	#{point_history_useway},
+    	#{point_history_amount},
+    	SYSDATE,
+    	#{point_history_leftover_point}+#{point_history_amount}
+	)
+	</insert>
+	<insert id="writeMinusMemberPointHistory">
+	INSERT INTO PB_Member_Point_History VALUES(
+		PB_Member_Point_History_seq.nextval,
+    	#{member_no},
+    	#{point_history_useway},
+    	#{point_history_amount},
+    	SYSDATE,
+    	#{point_history_leftover_point}-#{point_history_amount}
+	)
+	</insert>
+	<!-- 회원 포인트 내역 출력 -->
+	<select id="getMemberPointHistoryByNo" resultType="com.ja.pickbody.vo.MemberPointHistoryVo">
+	SELECT * FROM PB_Member_Point_History WHERE member_no = #{member_no} ORDER BY point_history_date DESC
+	</select>
+	
+	<!-- 회원 금지 -->
+	<select id="getMemberInhibitionByMemberNo" resultType="com.ja.pickbody.vo.MemberInhibitionVo">
+		SELECT * FROM PB_Member_Inhibition WHERE member_no = #{no}
+	</select>
+	
+	<!-- 로그인 부분 -->
+	<select id="getMemberByIdAndPw" resultType="com.ja.pickbody.vo.MemberVo">
+		SELECT * 
+		FROM PB_Member
+		WHERE member_id = #{member_id}
+		AND member_pw = #{member_pw}
+	</select>
+	
+	<select id="getMemberByNo" resultType="com.ja.pickbody.vo.MemberVo">
+		SELECT * FROM PB_Member WHERE member_no = #{no}
+	</select>
+	
+	<!-- PT 프로그램 구독 부분 -->
+	<select id="getTrainerList" resultType="com.ja.pickbody.vo.TrainerVo">
+		SELECT * FROM PB_Trainer
+	</select>
+
+	<insert id="addPTProgram">
+		INSERT INTO PB_PT_Program 
+		VALUES (
+			PB_PT_Program_seq.nextval,
+			#{trainer_no},
+			#{member_no},
+			#{goal_category_no},
+			#{start_date},
+			#{how_weeks}
+		)
+	</insert>
+	
+	<select id="getPTProgramByMemberNo"	resultType="com.ja.pickbody.vo.PTProgramVo">
+		select * FROM PB_PT_Program WHERE member_no=#{memberNo}
+	</select>
+	<!-- 오늘의 할일 조회 -->
+	<select id="getScheduleDailyByTodayAndWeekNo" resultType="com.ja.pickbody.vo.ScheduleDailyVo">
+		SELECT * FROM PB_SCHEDULE_DAILY 
+		WHERE schedule_week_no = #{schedule_week_no} 
+		AND schedule_date = #{schedule_date}
+	</select>
+	
+	<!-- 회원 일지 부분 -->
+	<select id="getMemberDailyNoteByScheduleNo" resultType="com.ja.pickbody.vo.MemberDailyNoteVo">
+		SELECT * FROM PB_Member_Daily_Note WHERE schedule_no = #{scheduleNo}
+	</select>
+	<select id="getRecordListByRutineNo" resultType="com.ja.pickbody.vo.RutineDailyRecordVo">
+		SELECT * FROM PB_Rutine_Daily_Record WHERE rutine_no=#{rutineNo}
+	</select>
+	
+	<insert id="addMemberDailyNote">
+	INSERT INTO PB_Member_Daily_Note VALUES (
+		PB_Member_Daily_Note_seq.nextval,
+		#{schedule_no},
+		#{trainer_score},
+		#{member_review}
+	)
+	</insert>
+	
+	<insert id="addRutineDailyRecord">
+	INSERT INTO PB_Rutine_Daily_Record VALUES (
+		PB_Rutine_Daily_Record_seq.nextval,
+		#{rutine_no},
+		#{rutine_record_time},
+		SYSDATE
+	)
+	</insert>
+	
+<!-- 내 친구목록 -->
+	<select id="getMyfollow" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_Follow 
+		WHERE group_no
+		IN (SELECT Group_no FROM PB_Follow_Group WHERE member_no=#{member_no})
+	</select>
+	<!-- 내가가진 특정 그룹 안의 팔로우 멤버들 가져오기 -->
+	<select id="getFollowInAnyGroup" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_Follow WHERE group_no=#{group_no}
+	</select>
+	<!-- 팔로우그룹이름가져오기 -->
+	<select id="getGroupName" resultType="com.ja.pickbody.vo.FollowGroupVo">
+		SELECT group_name FROM PB_follow_Group 
+		WHERE group_no = #{group_no}
+	</select>
+	<!-- 상대회원닉네임가져오기 -->
+	<select id="getNickname" resultType="com.ja.pickbody.vo.MemberVo">
+		SELECT * FROM PB_Member 
+		WHERE member_no = #{follow_member_no}
+	</select>
+	
+	<!-- 팔로우하기 -->
+	<insert id="addFollow">
+		INSERT INTO PB_Follow VALUES(
+		    PB_Follow_seq.nextval,
+		    #{group_no},
+		    #{follow_member_no}
+		)
+	</insert>
+	<!-- 팔로우 여부확인 -->
+	<select id="checkFollowState" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_Follow 
+		WHERE GROUP_NO 
+		IN (SELECT GROUP_NO FROM PB_FOLLOW_GROUP WHERE member_no = #{member_no})
+		AND member_no =  #{follow_member_no}
+	</select>
+	<!-- 선택한 그룹에 이미 팔로우 되어있는지 여부 확인 -->
+	<select id="checkFollowSasteteInGroup" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_Follow 
+		WHERE group_no =#{group_no} 
+		AND member_no=#{follow_member_no}
+	</select>
+	<!-- 검색시에 언팔로우 -->
+	<delete id="deleteFollow">
+		DELETE FROM PB_Follow
+		WHERE group_no IN
+		    (SELECT group_no FROM PB_Follow_Group WHERE member_no=#{member_no})
+		    AND member_no = #{follow_member_no}
+	</delete>
+	<!-- 내 그룹목록 가져오기 (팔로우추가할때사용) -->
+	<select id="getMyGroup" resultType="com.ja.pickbody.vo.FollowGroupVo">
+		SELECT * FROM PB_Follow_Group WHERE member_no = #{member_no}
+		ORDER BY group_no ASC
+	</select>
+	<!-- 닉네임으로 회원번호 뽑기 (회원닉네임검색시사용) -->
+	<select id="getMemberNoFromNick" resultType="int">
+		SELECT member_no FROM PB_Member 
+		WHERE member_nick = #{member_nick}
+	</select>
+	
+	<!-- 회원가입시 기본그룹 생성해주기 -->
+	<insert id="createBasicGroupOfFollow">
+		INSERT INTO PB_Follow_Group VALUES(
+    		PB_Follow_Seq.nextval,
+		    #{memberNo},
+		    '기본그룹'
+		)
+	</insert>
+	<!-- 사용자가 그룹 생성하기 -->
+	<insert id="createFollowGroup">
+		INSERT INTO PB_Follow_Group VALUES(
+    	PB_Follow_Seq.nextval,
+		    #{member_no},
+		    #{group_name}
+		)
+	</insert>
+	<insert id="addNewGroup">
+		INSERT INTO PB_Follow_Group VALUES(
+    	PB_Follow_Seq.nextval,
+		    #{member_no},
+		    '새그룹'
+		)
+	</insert>
+	<!-- 한 그룹안에 팔로우 명단 보기 -->
+	<select id="getMemberInGroup" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_FOllow
+		WHERE group_no = #{group_no}
+	</select>
+	<!-- 그룹삭제시에 기본그룹으로 팔로우회원 옮기기 -->
+	<insert id="putIntoBasicGroupBeforeDelete">
+		INSERT INTO PB_Follow VALUES(
+		    PB_Follow_seq.nextval,
+		    #{basicGroupNo},
+		    #{follow_member_no}
+		)
+	</insert>
+	<!-- 그룹삭제 -->
+	<delete id="deleteFollowGroup">
+		DELETE FROM PB_Follow_Group WHERE group_no = #{group_no}
+	</delete>
+	<!-- 기본그룹에 넣어주기 위해서 해당 멤버의 기본그룹 번호 따오기 -->
+	<select id="getBasicGroupNo" resultType="com.ja.pickbody.vo.FollowGroupVo">
+		SELECT * FROM PB_Follow_Group 
+		WHERE group_name LIKE '기본그룹' 
+		AND member_no = #{member_no}
+	</select>
+	<!-- 쪽지쓰기 -->
+	<insert id="writeMessage">
+		INSERT INTO PB_Message VALUES(
+		    PB_Message_seq.nextval,
+		    #{sender_no},
+		    #{recieve_no},
+		    #{message_title},
+		    #{message_content},
+		    #{message_isRead},
+		    #{message_senderDelete},
+		    #{message_receiveDelete},
+		    SYSDATE,
+		    SYSDATE
+		)
+	</insert>
+	<!-- 보낸쪽지함 -->
+	<select id="sendMessage" resultType="com.ja.pickbody.vo.MessageVo">
+		SELECT * FROM PB_Message
+		WHERE sender_no = #{sender_no} 
+		AND message_senderDelete = 'N'
+	</select>
+	<select id="receiveMessage" resultType="com.ja.pickbody.vo.MessageVo">
+		SELECT * FROM PB_Message
+		WHERE recieve_no = #{recieve_no} 
+		AND message_receiveDelete = 'N'
+	</select>
+	<!-- 쪽지상세페이지 -->
+	<select id="messageDetailPage" resultType="com.ja.pickbody.vo.MessageVo">
+		SELECT * FROM PB_Message WHERE message_no=#{message_no}
+	</select>
+	<!-- 보낸메세지삭제업데이트 -->
+	<update id="updateSendMessageIsDeleted">
+		UPDATE PB_Message SET message_senderDelete = 'Y'
+		WHERE message_no = #{message_no}
+	</update>
+	<!-- 받은메세지삭제업데이트 -->
+	<update id="updateRecieveMessageIsDeleted">
+		UPDATE PB_Message SET message_receiveDelete = 'Y'
+		WHERE message_no = #{message_no}
+	</update>
+	<!-- 목록에서 언팔 -->
+	<delete id="deleteFollowMember">
+		DELETE FROM PB_Follow WHERE member_no=#{follow_member_no}
+	</delete>
+	
+	
+	<!-- ajax이후 -->
+	<!-- 스토리작성 -->
+	<insert id="writeStory">
+		INSERT INTO PB_Story VALUES(
+			PB_Story_seq.nextval,
+			#{member_no},
+		    #{story_content},
+		    #{story_img_url, jdbcType=VARCHAR},
+		    SYSDATE
+		)
+	</insert>
+	<!-- 그룹명 수정 -->
+	<update id="editGroupName">
+		UPDATE PB_Follow_Group SET group_name = #{group_name}
+		WHERE group_no = #{group_no}
+	</update>
+	
+	<!-- 나를 팔로우한 회원 찾는 쿼리,,조인없이 총3개사용 -->
+	<select id="getGroupNoForGetFollwerNo" resultType="com.ja.pickbody.vo.FollowVo">
+		SELECT * FROM PB_Follow WHERE member_no = #{member_no}
+	</select>
+	<select id="getMemberNoForGetFollowerNick" resultType="com.ja.pickbody.vo.FollowGroupVo">
+		SELECT * FROM PB_Follow_Group WHERE group_no = #{group_no}
+	</select>
+	
+	<!-- 스토리 목록 가져오기 -->
+	<select id="getMyStoryBoard" resultType="com.ja.pickbody.vo.StoryVo">
+		SELECT * FROM PB_Story 
+		WHERE member_no = #{member_no} 
+		OR member_no 
+		IN (SELECT member_no FROM PB_Follow WHERE group_no 
+		    IN( SELECT group_no FROM PB_Follow_Group WHERE member_no = #{member_no}))
+		    ORDER BY story_no DESC
+	</select>
+	<!-- 스토리 좋아요 개수 -->
+	<select id="countStoryLike" resultType="int">
+		SELECT COUNT(*) FROM PB_Story_Like
+		WHERE story_no = #{story_no}
+	</select>
+	<!-- 스토리 댓글 개수 -->
+	<select id="countStoryComment" resultType="int">
+		SELECT COUNT(*) FROM PB_Story_Comment
+		WHERE story_no = #{story_no}
+	</select>
+	<!-- 스토리좋아요 -->
+	<insert id="storyLike">
+		INSERT INTO PB_Story_Like VALUES(
+		    PB_Story_Like_seq.nextval,
+		    #{story_no},
+		    #{member_no},
+		    SYSDATE
+		)
+	</insert>
+	<select id="doILikeThisStory" resultType="int">
+		SELECT COUNT(*) FROM PB_Story_Like 
+		WHERE member_no = #{member_no} AND story_no = #{story_no}
+	</select>
+	<delete id="storyUnLike">
+		DELETE FROM PB_Story_Like 
+		WHERE member_no = #{member_no} AND story_no = #{story_no}
+	</delete>
+	<!-- 댓글쓰기 -->
+	<insert id="writeStoryComment">
+		INSERT INTO PB_Story_Comment VALUES(
+		    PB_Story_Comment_seq.nextval,
+		    #{story_no},
+		    #{member_no},
+		    #{st_comment_content},
+		    SYSDATE
+		)
+	</insert>
+	<!-- 댓글목록 --> 
+	<select id="getStoryComments" resultType="com.ja.pickbody.vo.StoryCommentVo">
+		SELECT * FROM PB_Story_Comment
+		WHERE story_no = #{story_no}
+		ORDER BY st_comment_no DESC
+	</select>
+	<!-- 댓글지우기 -->
+	<delete id="deleteStoryComment">
+		DELETE FROM PB_Story_Comment WHERE st_comment_no = #{st_comment_no}
+	</delete>
+	<!-- 스토리삭제 -->
+	<delete id="deleteStory">
+		DELETE FROM PB_Story
+		WHERE story_no = #{story_no}
+	</delete>
+	<!-- 스토리 삭제할때 좋아요도 삭제 -->
+	<delete id="delteLikesWithStory">
+		DELETE FROM PB_Story_Like WHERE story_no = #{story_no}
+	</delete>
+	
+	<!-- 좋아요 순으로 가져오기 -->
+	<select id="getMostLikesStoryMaxFive" resultType="com.ja.pickbody.vo.StoryLikeRownumVo">
+		<![CDATA[
+		SELECT ROWNUM
+		    ,STORY_NO
+		    ,LIKE_CNT
+		FROM (
+		    SELECT STORY_NO
+		          ,COUNT(STORY_NO) AS LIKE_CNT
+		    FROM PB_STORY_LIKE
+		    GROUP BY STORY_NO
+		    ORDER BY LIKE_CNT DESC
+		    )
+		WHERE ROWNUM <= 5
+		]]>
+	</select>
+	<select id="getStoryVo" resultType="com.ja.pickbody.vo.StoryVo">
+		SELECT * FROM PB_Story WHERE story_no = #{story_no}
+	</select>
+	
+	<!-- 팔로워 삭제하기 -->
+	<delete id="deleteMyFollower">
+		DELETE FROM PB_Follow
+		WHERE member_no = #{follower_member_no} 
+		AND group_no 
+		IN (SELECT group_no FROM PB_Follow_Group WHERE member_no=#{member_no})
+	</delete>
+	
+	<!-- 공통친구 -->
+	<select id="getCommonFollowers" resultType="com.ja.pickbody.vo.MemberVo">
+		SELECT * FROM PB_Member pbm
+			WHERE pbm.member_no IN(
+			    SELECT pbf.member_no
+			    FROM PB_Follow pbf , PB_Follow_Group pbfg
+			    WHERE pbf.group_no = pbfg.group_no
+			    AND pbfg.member_no IN (#{member_no},#{follow_member_no})
+			    GROUP BY pbf.member_no
+			    HAVING COUNT(*) = 2
+			)
+	</select>
+	
+	<!-- 좋아요 활동로그 -->
+	<select id="getMyFollowsLikeLogs" resultType="com.ja.pickbody.vo.StoryLikeVo">
+		SELECT * FROM (
+		    SELECT * FROM PB_Story_Like pbsl
+		    WHERE member_no IN (
+		        SELECT pbf.member_no FROM PB_Follow pbf , PB_Follow_Group pbfg
+		        WHERE pbf.group_no = pbfg.group_no
+		        AND pbfg.member_no = #{member_no}
+		    )
+		    ORDER BY pbsl.st_like_no DESC
+		) t1
+		<![CDATA[WHERE ROWNUM <= 10 ]]>
+	</select>
+	<!-- 댓글 활동로그 -->
+	<select id="getMyFollowsCommentLogs" resultType="com.ja.pickbody.vo.StoryCommentVo">
+		SELECT * FROM (
+		    SELECT * FROM PB_Story_comment pbsc
+		WHERE pbsc.member_no IN(
+		    SELECT pbf.member_no FROM PB_Follow pbf , PB_Follow_Group pbfg
+		    WHERE pbf.group_no = pbfg.group_no
+		    AND pbfg.member_no = #{member_no}
+		    )
+		    ORDER BY pbsc.st_comment_no DESC
+		) t1
+		<![CDATA[WHERE ROWNUM <= 10 ]]>
+	</select>
+	<!-- 스토리번호로 작성자뽑기 -->
+	<select id="getWriterFromStoryNo" resultType="com.ja.pickbody.vo.StoryVo">
+		SELECT * FROM PB_Story WHERE story_no = #{story_no}
+	</select>
+	
+	
+	
+</mapper>
